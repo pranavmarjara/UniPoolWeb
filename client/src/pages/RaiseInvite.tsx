@@ -6,10 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, Calendar, Clock, Car, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function RaiseInvite() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     pickupLocation: "",
     destination: "",
@@ -25,7 +26,6 @@ export default function RaiseInvite() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: "temp-user-id", // TODO: Get from auth context
           pickupLocation: data.pickupLocation,
           destination: data.destination,
           date: data.date,
@@ -40,6 +40,8 @@ export default function RaiseInvite() {
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["carpool-invites"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
       toast({
         title: "Invite Posted!",
         description: "Your ride invite has been posted successfully.",

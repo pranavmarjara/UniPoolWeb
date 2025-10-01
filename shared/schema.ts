@@ -19,7 +19,7 @@ export const users = pgTable("users", {
 
 export const carpoolRequests = pgTable("carpool_requests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull(),
+  userId: varchar("user_id").default("anonymous"),
   pickupLocation: text("pickup_location").notNull(),
   destination: text("destination").notNull(),
   date: text("date").notNull(),
@@ -32,7 +32,7 @@ export const carpoolRequests = pgTable("carpool_requests", {
 
 export const carpoolInvites = pgTable("carpool_invites", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull(),
+  userId: varchar("user_id").default("anonymous"),
   pickupLocation: text("pickup_location").notNull(),
   destination: text("destination").notNull(),
   date: text("date").notNull(),

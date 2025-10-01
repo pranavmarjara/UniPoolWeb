@@ -6,10 +6,10 @@ import { MapPin, Clock, Users, Star, ShieldCheck, Car } from "lucide-react";
 
 interface InviteCardProps {
   id: string;
-  userName: string;
+  userName?: string;
   userAvatar?: string;
-  isVerified: boolean;
-  rating: number;
+  isVerified?: boolean;
+  rating?: number;
   pickupLocation: string;
   destination: string;
   date: string;
@@ -19,10 +19,10 @@ interface InviteCardProps {
 }
 
 export function InviteCard({
-  userName,
+  userName = "Anonymous",
   userAvatar,
-  isVerified,
-  rating,
+  isVerified = false,
+  rating = 0,
   pickupLocation,
   destination,
   date,
@@ -53,10 +53,12 @@ export function InviteCard({
                 <ShieldCheck className="h-4 w-4 text-chart-2" data-testid="icon-verified" />
               )}
             </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Star className="h-3 w-3 fill-chart-4 text-chart-4" />
-              <span data-testid="text-rating">{rating.toFixed(1)}</span>
-            </div>
+            {rating > 0 && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Star className="h-3 w-3 fill-chart-4 text-chart-4" />
+                <span data-testid="text-rating">{rating.toFixed(1)}</span>
+              </div>
+            )}
           </div>
           <Badge variant="secondary" className="gap-1" data-testid="badge-seats">
             <Car className="h-3 w-3" />

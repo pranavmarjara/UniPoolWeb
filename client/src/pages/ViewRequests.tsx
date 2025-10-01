@@ -81,9 +81,6 @@ export default function ViewRequests() {
             <RequestCard 
               key={request.id} 
               id={request.id}
-              userName="Anonymous User"
-              isVerified={true}
-              rating={4.5}
               pickupLocation={request.pickupLocation}
               destination={request.destination}
               date={request.date}

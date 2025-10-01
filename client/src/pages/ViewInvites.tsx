@@ -81,9 +81,6 @@ export default function ViewInvites() {
             <InviteCard 
               key={invite.id}
               id={invite.id}
-              userName="Anonymous User"
-              isVerified={true}
-              rating={4.5}
               pickupLocation={invite.pickupLocation}
               destination={invite.destination}
               date={invite.date}
