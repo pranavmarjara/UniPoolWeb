@@ -3,6 +3,7 @@ import { InviteCard } from "@/components/InviteCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -15,55 +16,25 @@ export default function ViewInvites() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
 
-  const mockInvites = [
-    {
-      id: "1",
-      userName: "Mike Chen",
-      isVerified: true,
-      rating: 4.9,
-      pickupLocation: "North Campus Dorms",
-      destination: "City Center Station",
-      date: "Oct 6",
-      time: "8:00 AM",
-      availableSeats: 3,
-      notes: "Leaving right after morning class",
+  const { data: invites = [], isLoading } = useQuery({
+    queryKey: ["carpool-invites"],
+    queryFn: async () => {
+      const response = await fetch("/api/carpool-invites");
+      if (!response.ok) {
+        throw new Error("Failed to fetch invites");
+      }
+      return response.json();
     },
-    {
-      id: "2",
-      userName: "Lisa Taylor",
-      isVerified: true,
-      rating: 4.8,
-      pickupLocation: "Science Building",
-      destination: "Mountain Trail Park",
-      date: "Oct 7",
-      time: "9:00 AM",
-      availableSeats: 2,
-      notes: "Weekend hiking trip",
-    },
-    {
-      id: "3",
-      userName: "David Kim",
-      isVerified: true,
-      rating: 4.6,
-      pickupLocation: "Main Gate",
-      destination: "Shopping District",
-      date: "Oct 5",
-      time: "3:00 PM",
-      availableSeats: 1,
-    },
-    {
-      id: "4",
-      userName: "Rachel Green",
-      isVerified: false,
-      rating: 4.3,
-      pickupLocation: "Arts Center",
-      destination: "Concert Hall Downtown",
-      date: "Oct 8",
-      time: "7:00 PM",
-      availableSeats: 2,
-      notes: "Going to evening concert",
-    },
-  ];
+  });
+
+  const filteredInvites = invites.filter((invite: any) => {
+    const matchesSearch = 
+      searchQuery === "" ||
+      invite.pickupLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invite.destination.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesSearch;
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -100,13 +71,31 @@ export default function ViewInvites() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {mockInvites.map((invite) => (
-          <InviteCard key={invite.id} {...invite} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading invites...</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredInvites.map((invite: any) => (
+            <InviteCard 
+              key={invite.id}
+              id={invite.id}
+              userName="Anonymous User"
+              isVerified={true}
+              rating={4.5}
+              pickupLocation={invite.pickupLocation}
+              destination={invite.destination}
+              date={invite.date}
+              time={invite.time}
+              availableSeats={invite.availableSeats}
+              notes={invite.notes}
+            />
+          ))}
+        </div>
+      )}
 
-      {mockInvites.length === 0 && (
+      {!isLoading && filteredInvites.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No invites found</p>
         </div>

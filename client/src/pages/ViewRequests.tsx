@@ -3,6 +3,7 @@ import { RequestCard } from "@/components/RequestCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -15,55 +16,25 @@ export default function ViewRequests() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
 
-  const mockRequests = [
-    {
-      id: "1",
-      userName: "Sarah Johnson",
-      isVerified: true,
-      rating: 4.8,
-      pickupLocation: "Main Campus Library",
-      destination: "Downtown Shopping Mall",
-      date: "Oct 5",
-      time: "2:30 PM",
-      passengers: 2,
-      notes: "Prefer non-smoking drivers",
+  const { data: requests = [], isLoading } = useQuery({
+    queryKey: ["carpool-requests"],
+    queryFn: async () => {
+      const response = await fetch("/api/carpool-requests");
+      if (!response.ok) {
+        throw new Error("Failed to fetch requests");
+      }
+      return response.json();
     },
-    {
-      id: "2",
-      userName: "Alex Martinez",
-      isVerified: true,
-      rating: 4.9,
-      pickupLocation: "Engineering Building",
-      destination: "Airport Terminal 1",
-      date: "Oct 6",
-      time: "6:00 AM",
-      passengers: 1,
-      notes: "Early morning flight",
-    },
-    {
-      id: "3",
-      userName: "Emma Wilson",
-      isVerified: false,
-      rating: 4.2,
-      pickupLocation: "Student Housing Block A",
-      destination: "City Hospital",
-      date: "Oct 5",
-      time: "11:00 AM",
-      passengers: 1,
-    },
-    {
-      id: "4",
-      userName: "James Lee",
-      isVerified: true,
-      rating: 4.7,
-      pickupLocation: "Sports Complex",
-      destination: "Beach Boardwalk",
-      date: "Oct 7",
-      time: "4:00 PM",
-      passengers: 3,
-      notes: "Going for weekend outing",
-    },
-  ];
+  });
+
+  const filteredRequests = requests.filter((request: any) => {
+    const matchesSearch = 
+      searchQuery === "" ||
+      request.pickupLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.destination.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesSearch;
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -100,13 +71,31 @@ export default function ViewRequests() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {mockRequests.map((request) => (
-          <RequestCard key={request.id} {...request} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading requests...</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredRequests.map((request: any) => (
+            <RequestCard 
+              key={request.id} 
+              id={request.id}
+              userName="Anonymous User"
+              isVerified={true}
+              rating={4.5}
+              pickupLocation={request.pickupLocation}
+              destination={request.destination}
+              date={request.date}
+              time={request.time}
+              passengers={request.passengers}
+              notes={request.notes}
+            />
+          ))}
+        </div>
+      )}
 
-      {mockRequests.length === 0 && (
+      {!isLoading && filteredRequests.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No requests found</p>
         </div>
