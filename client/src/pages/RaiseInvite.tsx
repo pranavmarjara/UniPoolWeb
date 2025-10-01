@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, Calendar, Clock, Car, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 export default function RaiseInvite() {
   const { toast } = useToast();
@@ -18,21 +19,52 @@ export default function RaiseInvite() {
     notes: "",
   });
 
+  const createInviteMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await fetch("/api/carpool-invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "temp-user-id", // TODO: Get from auth context
+          pickupLocation: data.pickupLocation,
+          destination: data.destination,
+          date: data.date,
+          time: data.time,
+          availableSeats: parseInt(data.availableSeats),
+          notes: data.notes || null,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create invite");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Invite Posted!",
+        description: "Your ride invite has been posted successfully.",
+      });
+      setFormData({
+        pickupLocation: "",
+        destination: "",
+        date: "",
+        time: "",
+        availableSeats: "1",
+        notes: "",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to post your invite. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Invite submitted:", formData);
-    toast({
-      title: "Invite Posted!",
-      description: "Your ride invite has been posted successfully.",
-    });
-    setFormData({
-      pickupLocation: "",
-      destination: "",
-      date: "",
-      time: "",
-      availableSeats: "1",
-      notes: "",
-    });
+    createInviteMutation.mutate(formData);
   };
 
   const handleChange = (
@@ -128,7 +160,7 @@ export default function RaiseInvite() {
                     value={formData.time}
                     onChange={handleChange}
                     required
-                    data-testid="input-time"
+                    data-testid="input-date"
                   />
                 </div>
               </div>
@@ -166,9 +198,14 @@ export default function RaiseInvite() {
                 />
               </div>
 
-              <Button type="submit" className="w-full gap-2" data-testid="button-submit">
+              <Button 
+                type="submit" 
+                className="w-full gap-2" 
+                data-testid="button-submit"
+                disabled={createInviteMutation.isPending}
+              >
                 <Send className="h-4 w-4" />
-                Post Invite
+                {createInviteMutation.isPending ? "Posting..." : "Post Invite"}
               </Button>
             </form>
           </CardContent>

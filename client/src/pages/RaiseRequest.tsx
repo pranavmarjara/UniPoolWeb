@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, Calendar, Clock, Users, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 export default function RaiseRequest() {
   const { toast } = useToast();
@@ -18,21 +19,52 @@ export default function RaiseRequest() {
     notes: "",
   });
 
+  const createRequestMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await fetch("/api/carpool-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "temp-user-id", // TODO: Get from auth context
+          pickupLocation: data.pickupLocation,
+          destination: data.destination,
+          date: data.date,
+          time: data.time,
+          passengers: parseInt(data.passengers),
+          notes: data.notes || null,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create request");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Request Posted!",
+        description: "Your ride request has been posted successfully.",
+      });
+      setFormData({
+        pickupLocation: "",
+        destination: "",
+        date: "",
+        time: "",
+        passengers: "1",
+        notes: "",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to post your request. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Request submitted:", formData);
-    toast({
-      title: "Request Posted!",
-      description: "Your ride request has been posted successfully.",
-    });
-    setFormData({
-      pickupLocation: "",
-      destination: "",
-      date: "",
-      time: "",
-      passengers: "1",
-      notes: "",
-    });
+    createRequestMutation.mutate(formData);
   };
 
   const handleChange = (
@@ -166,9 +198,14 @@ export default function RaiseRequest() {
                 />
               </div>
 
-              <Button type="submit" className="w-full gap-2" data-testid="button-submit">
+              <Button 
+                type="submit" 
+                className="w-full gap-2" 
+                data-testid="button-submit"
+                disabled={createRequestMutation.isPending}
+              >
                 <Send className="h-4 w-4" />
-                Post Request
+                {createRequestMutation.isPending ? "Posting..." : "Post Request"}
               </Button>
             </form>
           </CardContent>
