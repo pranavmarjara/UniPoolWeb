@@ -2,8 +2,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { MapPinned, Car, PlusCircle, UserPlus, TrendingUp, Users, Shield } from "lucide-react";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
+  const { data: stats } = useQuery({
+    queryKey: ["stats"],
+    queryFn: async () => {
+      const response = await fetch("/api/stats");
+      if (!response.ok) {
+        throw new Error("Failed to fetch stats");
+      }
+      return response.json();
+    },
+  });
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -18,7 +30,9 @@ export default function Dashboard() {
             <MapPinned className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-active-requests">12</div>
+            <div className="text-2xl font-bold" data-testid="text-active-requests">
+              {stats?.activeRequests ?? 0}
+            </div>
             <p className="text-xs text-muted-foreground">Looking for rides</p>
           </CardContent>
         </Card>
@@ -29,7 +43,9 @@ export default function Dashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-available-rides">8</div>
+            <div className="text-2xl font-bold" data-testid="text-available-rides">
+              {stats?.activeInvites ?? 0}
+            </div>
             <p className="text-xs text-muted-foreground">Drivers offering seats</p>
           </CardContent>
         </Card>
@@ -40,8 +56,10 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-rides-completed">24</div>
-            <p className="text-xs text-muted-foreground">+3 this week</p>
+            <div className="text-2xl font-bold" data-testid="text-rides-completed">
+              {stats?.ridesCompleted ?? 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Total completed</p>
           </CardContent>
         </Card>
       </div>
