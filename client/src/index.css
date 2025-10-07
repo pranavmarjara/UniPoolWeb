@@ -132,67 +132,67 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 220 20% 10%;
+  --background: 280 30% 8%;
 
   --foreground: 0 0% 95%;
 
-  --border: 220 15% 25%;
+  --border: 280 20% 25%;
 
-  --card: 220 18% 14%;
+  --card: 280 25% 12%;
 
   --card-foreground: 0 0% 95%;
 
-  --card-border: 220 15% 20%;
+  --card-border: 280 20% 18%;
 
-  --sidebar: 220 18% 16%;
+  --sidebar: 280 25% 14%;
 
   --sidebar-foreground: 0 0% 95%;
 
-  --sidebar-border: 220 15% 22%;
+  --sidebar-border: 280 20% 20%;
 
-  --sidebar-primary: 220 85% 65%;
+  --sidebar-primary: 280 80% 65%;
 
-  --sidebar-primary-foreground: 220 20% 10%;
+  --sidebar-primary-foreground: 280 30% 8%;
 
-  --sidebar-accent: 220 16% 20%;
+  --sidebar-accent: 280 22% 18%;
 
   --sidebar-accent-foreground: 0 0% 92%;
 
-  --sidebar-ring: 220 85% 65%;
+  --sidebar-ring: 280 80% 65%;
 
-  --popover: 220 18% 18%;
+  --popover: 280 25% 16%;
 
   --popover-foreground: 0 0% 95%;
 
-  --popover-border: 220 15% 24%;
+  --popover-border: 280 20% 22%;
 
-  --primary: 220 85% 65%;
+  --primary: 280 80% 65%;
 
-  --primary-foreground: 220 20% 10%;
+  --primary-foreground: 280 30% 8%;
 
-  --secondary: 220 16% 22%;
+  --secondary: 320 60% 50%;
 
-  --secondary-foreground: 0 0% 92%;
+  --secondary-foreground: 0 0% 98%;
 
-  --muted: 220 16% 18%;
+  --muted: 280 20% 16%;
 
-  --muted-foreground: 220 10% 65%;
+  --muted-foreground: 280 15% 65%;
 
-  --accent: 220 18% 24%;
+  --accent: 320 70% 55%;
 
-  --accent-foreground: 0 0% 92%;
+  --accent-foreground: 0 0% 98%;
 
   --destructive: 0 80% 65%;
 
   --destructive-foreground: 0 0% 98%;
 
-  --input: 220 15% 35%;
-  --ring: 220 85% 65%;
-  --chart-1: 220 85% 70%;
-  --chart-2: 140 55% 65%;
-  --chart-3: 280 60% 68%;
-  --chart-4: 35 90% 70%;
-  --chart-5: 190 70% 68%;
+  --input: 280 20% 35%;
+  --ring: 280 80% 65%;
+  --chart-1: 280 85% 70%;
+  --chart-2: 320 75% 65%;
+  --chart-3: 290 70% 68%;
+  --chart-4: 310 80% 70%;
+  --chart-5: 270 65% 68%;
 
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.15);
   --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.20);
@@ -240,7 +240,35 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    position: relative;
+    background: linear-gradient(135deg, hsl(280, 30%, 8%) 0%, hsl(290, 25%, 12%) 50%, hsl(280, 30%, 8%) 100%);
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: 
+      radial-gradient(circle at 20% 50%, hsla(280, 80%, 50%, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsla(320, 70%, 50%, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, hsla(290, 60%, 45%, 0.1) 0%, transparent 50%);
+    animation: backgroundPulse 15s ease-in-out infinite;
+  }
+}
+
+@keyframes backgroundPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
